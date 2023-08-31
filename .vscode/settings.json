@@ -1,0 +1,8 @@
+{
+  "files.associations": {
+    "snakequeue.h": "c",
+    "snake_queue.h": "c",
+    "stdio.h": "c",
+    "stdbool.h": "c"
+  }
+}
