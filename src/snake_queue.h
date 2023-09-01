@@ -35,4 +35,6 @@ void remove_body_part(Snake *snake);
 void move_tail(Snake *snake);
 void move_head(Snake *snake, int direction);
 
+void free_snake(Snake *snake);
+
 #endif

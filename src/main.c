@@ -82,6 +82,7 @@ int main() {
         printf("\nYour score was %i, and your personal best is %i\n", score, highestScore);
     }
 
+    free_snake(&snake);
     return EXIT_SUCCESS;
 }
 

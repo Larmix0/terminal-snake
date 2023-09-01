@@ -72,3 +72,17 @@ void move_head(Snake *snake, int direction) {
     add_body_part(snake, newLocation);
     replace_square(newLocation, SNAKE_BODY_SYMBOL);
 }
+
+void free_snake(Snake *snake) {
+    // no need to check edge case where snake size is 0 since that's impossible
+    BodyPart *current = snake->head;
+    BodyPart *next = NULL;
+
+    // stores next body part and frees current one
+    while (current->next != NULL) {
+        next = current->next;
+        free(current);
+        current = next;
+    }
+    free(current); // free tail since its ->next is NULL
+}
