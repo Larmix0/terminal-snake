@@ -1,13 +1,6 @@
 #ifndef SNAKE_QUEUE_H
 #define SNAKE_QUEUE_H
 
-typedef enum {
-    UP = 72,
-    DOWN = 80,
-    RIGHT = 77,
-    LEFT = 75
-} Direction;
-
 typedef struct {
     int x;
     int y;

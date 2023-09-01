@@ -8,4 +8,11 @@
 #define APPLE_SYMBOL '*'
 #define EMPTY_SYMBOL '.'
 
+typedef enum {
+    UP = 72,
+    DOWN = 80,
+    RIGHT = 77,
+    LEFT = 75
+} Direction;
+
 #endif
