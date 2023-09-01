@@ -61,7 +61,26 @@ int main() {
     printf("\033[?25h");
     printf("\033[1B");
     
-    printf("\nGame over! Your score is %i\n", snake.length-1);
+    int score = snake.length-1;
+    int highScore = 0; // default if read file doesn't exist
+    FILE *scoreRead = fopen("high_score.txt", "r");
+    if (scoreRead != NULL) {
+        fscanf(scoreRead, "%d", &highScore);
+    }
+    fclose(scoreRead);
+
+    int highestScore = score > highScore ? score : highScore;
+    FILE *scoreWrite = fopen("high_score.txt", "w");
+    fprintf(scoreWrite, "%d", highestScore);
+    fclose(scoreWrite);
+
+    bool newPersonalBest = score > highScore ? true : false;
+    if (newPersonalBest) {
+        printf("\nCongratulations, your new personal best is %i\n", highestScore);
+    }
+    else {
+        printf("\nYour score was %i, and your personal best is %i\n", score, highestScore);
+    }
 
     return EXIT_SUCCESS;
 }
