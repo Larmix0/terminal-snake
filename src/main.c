@@ -5,18 +5,19 @@
 #include <windows.h>
 #include <conio.h>
 
+#include "constants.h"
 #include "snake_queue.h"
 #include "replace_char.h"
 
 void render_board();
 void replace_square(Location squareLocation, char newSquare);
-void handle_movement(int *direction);
+void handle_movement(Direction *direction);
 
 Location spawn_apple(Snake *snake);
 bool apple_eaten(Snake snake, Location *apple);
 
 bool body_collided(Snake *snake);
-bool border_collided(Snake *snake, int direction);
+bool border_collided(Snake *snake, Direction direction);
 
 int main() {
     // hides cursor. Small delay because with no delay hiding sometimes fails
@@ -37,7 +38,7 @@ int main() {
     replace_square(snake.head->location, SNAKE_BODY_SYMBOL);
 
     Location apple = spawn_apple(&snake);
-    int direction = UP;
+    Direction direction = UP;
 
     while (1) {
         Sleep(65);
@@ -106,7 +107,7 @@ void render_board() {
     }
 }
 
-void handle_movement(int *direction) {
+void handle_movement(Direction *direction) {
     // no press detected
     if (!kbhit()) {
         return;
@@ -193,7 +194,7 @@ bool body_collided(Snake *snake) {
     return false;
 }
 
-bool border_collided(Snake *snake, int direction) {
+bool border_collided(Snake *snake, Direction direction) {
     Location headLocation = snake->head->location;
 
     // predicts next location

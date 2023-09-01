@@ -1,5 +1,6 @@
 #include <stdio.h>
 
+#include "constants.h"
 #include "snake_queue.h"
 
 void replace_square(Location squareLocation, char newSquare) {

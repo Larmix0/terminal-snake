@@ -1,5 +1,6 @@
 #include <stdlib.h>
 
+#include "constants.h"
 #include "snake_queue.h"
 #include "replace_char.h"
 
@@ -60,7 +61,7 @@ void move_tail(Snake *snake) {
     remove_body_part(snake);
 }
 
-void move_head(Snake *snake, int direction) {
+void move_head(Snake *snake, Direction direction) {
     Location newLocation = {snake->head->location.x, snake->head->location.y};
 
     switch (direction) {
