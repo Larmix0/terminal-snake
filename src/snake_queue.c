@@ -4,8 +4,20 @@
 #include "snake_queue.h"
 #include "locations.h"
 
+Snake *snake_init(Location firstPart) {
+    Snake *snake = malloc(sizeof(Snake));
+    snake->head = NULL;
+    snake->tail = NULL;
+    snake->length = 0;
+
+    add_body_part(snake, firstPart);
+    replace_location(snake->head->location, SNAKE_BODY_SYMBOL);
+
+    return snake;
+}
+
 /*
- * Initializes a new body part, and adds it as the new head.
+ * creates a new body part, and adds it as the new head.
  * It also has to handle having no body parts.
  * This could happen while moving with one body part
  * since we delete the head and then put it somewhere else in that case.
@@ -79,18 +91,10 @@ void move_head(Snake *snake, Direction direction) {
     Location newLocation = {snake->head->location.x, snake->head->location.y};
 
     switch (direction) {
-    case UP:
-        newLocation.y--;
-        break;
-    case LEFT:
-        newLocation.x--;
-        break;
-    case RIGHT:
-        newLocation.x++;
-        break;
-    case DOWN:
-        newLocation.y++;
-        break;
+    case UP: newLocation.y--; break;
+    case LEFT: newLocation.x--; break;
+    case RIGHT: newLocation.x++; break;
+    case DOWN: newLocation.y++; break;
     }
     add_body_part(snake, newLocation);
     replace_location(newLocation, SNAKE_BODY_SYMBOL);
@@ -99,7 +103,7 @@ void move_head(Snake *snake, Direction direction) {
 /*
  * Calls free on all allocated memory in the snake by doing it on all of the body parts.
  */
-void free_snake(Snake *snake) {
+void free_body_parts(Snake *snake) {
     BodyPart *current = snake->head;
     BodyPart *next = NULL;
 

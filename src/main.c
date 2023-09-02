@@ -9,11 +9,12 @@
 #include "snake_queue.h"
 #include "locations.h"
 
+int play_snake(Snake *snake);
 void render_board();
 void handle_movement(Direction *direction);
 
 Location spawn_apple(Snake *snake);
-bool apple_eaten(Snake snake, Location apple);
+bool apple_eaten(Snake *snake, Location apple);
 
 bool body_collided(Snake *snake);
 bool border_collided(Snake *snake, Direction direction);
@@ -28,53 +29,54 @@ int main() {
     // hides cursor. Small delay because it sometimes fails to hide it otherwise
     Sleep(50);
     printf("\033[?25l\n\n");
-
     srand(time(0));
     render_board();
-
-    // goes 1 up 1 left so caret isn't outside map, then saves so we can always get back here
-    printf("\033[1A\033[1D");
-    printf("\033[s");
+    printf("\033[1A\033[1D\033[s"); // goes 1 up 1 left so caret's not outside map, then saves position
 
     // Initialize snake with first body part
-    Snake snake = {.head=NULL, .tail=NULL, .length=0};
     Location firstPart = {COLS - 1, ROWS - 1};
-    add_body_part(&snake, firstPart);
-    replace_location(snake.head->location, SNAKE_BODY_SYMBOL);
+    Snake *snake = snake_init(firstPart);
+    int score = play_snake(snake);
 
-    Location apple = spawn_apple(&snake);
+    // show cursor and go down a line with caret
+    printf("\033[?25h\033[1B");
+    end_screen(score);
+
+    free_body_parts(snake);
+    free(snake);
+    
+    return EXIT_SUCCESS;
+}
+
+/*
+ * Play the game of snake once with the passed snake.
+ */
+int play_snake(Snake *snake) {
+    Location apple = spawn_apple(snake);
     Direction direction = UP;
 
     while (1) {
         Sleep(DELAY_MS);
         handle_movement(&direction);
-        if (border_collided(&snake, direction)) {
+        if (border_collided(snake, direction)) {
             break;
         }
 
-        move_head(&snake, direction);
+        move_head(snake, direction);
         bool appleChanged = apple_eaten(snake, apple);
         if (appleChanged) {
-            apple = spawn_apple(&snake);
+            apple = spawn_apple(snake);
         }
         else {
-            move_tail(&snake);
+            move_tail(snake);
         }
 
-        if (body_collided(&snake)) {
+        if (body_collided(snake)) {
             break;
         }
     }
-
-    // show cursor and go down a line with caret
-    printf("\033[?25h");
-    printf("\033[1B");
-
-    int score = snake.length - 1;
-    end_screen(score);
-
-    free_snake(&snake);
-    return EXIT_SUCCESS;
+    int score = snake->length - 1;
+    return score;
 }
 
 /*
@@ -108,12 +110,7 @@ void render_board() {
  * That's why we return/skip if we don't get the special signal (int 0)
  */
 void handle_movement(Direction *direction) {
-    // no press detected
-    if (!kbhit()) {
-        return;
-    }
-    char keyPressed = getch();
-    if (keyPressed != 0) {
+    if (!kbhit() || getch() != 0) {
         return;
     }
     // first char was special signal (0) so now we detect 2nd char
@@ -171,8 +168,8 @@ Location spawn_apple(Snake *snake) {
 /*
  * Checks if apple was eaten by seeing if its location matches any of the snake's body parts.
  */
-bool apple_eaten(Snake snake, Location apple) {
-    if (locations_match(snake.head->location, apple)) {
+bool apple_eaten(Snake *snake, Location apple) {
+    if (locations_match(snake->head->location, apple)) {
         return true;
     }
     return false;
