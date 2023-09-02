@@ -8,6 +8,8 @@
 #define APPLE_SYMBOL '*'
 #define EMPTY_SYMBOL '.'
 
+#define DELAY_MS 65
+
 typedef enum {
     UP = 72,
     DOWN = 80,

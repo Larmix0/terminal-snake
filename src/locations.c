@@ -9,11 +9,11 @@
  * we only move if we know the math expression's result will be 1 or higher
  */
 void replace_location(Location squareLocation, char newSquare) {
-    if (squareLocation.y != ROWS-1) {
-        printf("\033[%iA", ROWS-squareLocation.y-1); // go up rows
+    if (squareLocation.y != ROWS - 1) {
+        printf("\033[%iA", ROWS - squareLocation.y - 1); // go up rows
     }
-    if (squareLocation.x != COLS-1) {
-        printf("\033[%iD", COLS-squareLocation.x-1); // go right cols
+    if (squareLocation.x != COLS - 1) {
+        printf("\033[%iD", COLS - squareLocation.x - 1); // go right cols
     }
     // write char then go back to original/saved position
     printf("\b%c", newSquare);

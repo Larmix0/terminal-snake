@@ -13,10 +13,13 @@ void render_board();
 void handle_movement(Direction *direction);
 
 Location spawn_apple(Snake *snake);
-bool apple_eaten(Snake snake, Location *apple);
+bool apple_eaten(Snake snake, Location apple);
 
 bool body_collided(Snake *snake);
 bool border_collided(Snake *snake, Direction direction);
+
+void cmp_score_with_pb(int score, int *highestScore, bool *isPersonalBest);
+void end_screen(int score);
 
 /*
  * Main function that runs snake.
@@ -33,8 +36,8 @@ int main() {
     printf("\033[1A\033[1D");
     printf("\033[s");
 
-    // initialize snake, must set head and tail to NULL because of garbage values
-    Snake snake = {NULL, NULL, 0};
+    // Initialize snake with first body part
+    Snake snake = {.head=NULL, .tail=NULL, .length=0};
     Location firstPart = {COLS - 1, ROWS - 1};
     add_body_part(&snake, firstPart);
     replace_location(snake.head->location, SNAKE_BODY_SYMBOL);
@@ -43,15 +46,18 @@ int main() {
     Direction direction = UP;
 
     while (1) {
-        Sleep(65);
+        Sleep(DELAY_MS);
         handle_movement(&direction);
         if (border_collided(&snake, direction)) {
             break;
         }
 
         move_head(&snake, direction);
-        bool appleChanged = apple_eaten(snake, &apple);
-        if (!appleChanged) {
+        bool appleChanged = apple_eaten(snake, apple);
+        if (appleChanged) {
+            apple = spawn_apple(&snake);
+        }
+        else {
             move_tail(&snake);
         }
 
@@ -65,25 +71,7 @@ int main() {
     printf("\033[1B");
 
     int score = snake.length - 1;
-    int highScore = 0; // default if read file doesn't exist
-    FILE *scoreRead = fopen("high_score.txt", "r");
-    if (scoreRead != NULL) {
-        fscanf(scoreRead, "%d", &highScore);
-    }
-    fclose(scoreRead);
-
-    int highestScore = score > highScore ? score : highScore;
-    FILE *scoreWrite = fopen("high_score.txt", "w");
-    fprintf(scoreWrite, "%d", highestScore);
-    fclose(scoreWrite);
-
-    bool newPersonalBest = score > highScore ? true : false;
-    if (newPersonalBest) {
-        printf("\nCongratulations, your new personal best is %i\n", highestScore);
-    }
-    else {
-        printf("\nYour score was %i, and your personal best is %i\n", score, highestScore);
-    }
+    end_screen(score);
 
     free_snake(&snake);
     return EXIT_SUCCESS;
@@ -183,9 +171,8 @@ Location spawn_apple(Snake *snake) {
 /*
  * Checks if apple was eaten by seeing if its location matches any of the snake's body parts.
  */
-bool apple_eaten(Snake snake, Location *apple) {
-    if (locations_match(snake.head->location, *apple)) {
-        *apple = spawn_apple(&snake);
+bool apple_eaten(Snake snake, Location apple) {
+    if (locations_match(snake.head->location, apple)) {
         return true;
     }
     return false;
@@ -222,18 +209,10 @@ bool border_collided(Snake *snake, Direction direction) {
 
     // predicts next location
     switch (direction) {
-    case UP:
-        headLocation.y--;
-        break;
-    case DOWN:
-        headLocation.y++;
-        break;
-    case RIGHT:
-        headLocation.x++;
-        break;
-    case LEFT:
-        headLocation.x--;
-        break;
+        case UP: headLocation.y--; break;
+        case DOWN: headLocation.y++; break;
+        case RIGHT: headLocation.x++; break;
+        case LEFT: headLocation.x--; break;
     }
     // check if we'll collide
     if (headLocation.x < 0 || headLocation.x >= COLS) {
@@ -243,4 +222,39 @@ bool border_collided(Snake *snake, Direction direction) {
         return true;
     }
     return false;
+}
+
+/*
+ * compares player's score with high score stored in .txt file
+ */
+void cmp_score_with_pb(int score, int *highestScore, bool *isPersonalBest) {
+    int highScore = 0; // default if read file doesn't exist
+    FILE *scoreRead = fopen("high_score.txt", "r");
+    if (scoreRead != NULL) {
+        fscanf(scoreRead, "%d", &highScore);
+    }
+    fclose(scoreRead);
+
+    *highestScore = score > highScore ? score : highScore;
+    FILE *scoreWrite = fopen("high_score.txt", "w");
+    fprintf(scoreWrite, "%d", *highestScore);
+    fclose(scoreWrite);
+
+    *isPersonalBest = score > highScore ? true : false;
+}
+
+/*
+ * Displays end screen.
+ */
+void end_screen(int score) {
+    bool isPersonalBest;
+    int highestScore;
+    cmp_score_with_pb(score, &highestScore, &isPersonalBest);
+
+    if (isPersonalBest) {
+        printf("\nCongratulations, your new personal best is %i\n", highestScore);
+    }
+    else {
+        printf("\nYour score was %i, and your personal best is %i\n", score, highestScore);
+    }
 }
