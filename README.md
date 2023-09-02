@@ -1,11 +1,10 @@
 # Snake game in terminal (no GUI)
-This is a small side-project I did when learning c to get more comfortable in memory management and pointers. There are no dependencies on this project other than builtin libraries
+This is a small side-project I did when learning c to get more comfortable in memory management and pointers. There are no dependencies on this project other than builtin libraries. It uses ansi escape sequences to manipulate the terminal. 
 
-# Compile
-Currently you have to run the following inside the src directory (I'll likely update it later with a makefile, but i've been too lazy to install it):
-
+# Compile and run
+Inside the terminal_snake directory, simply run:
 ```
-gcc -o snake main.c replace_char.c snake_queue.c
+make all
 ```
 
 Then you start the game by running:
