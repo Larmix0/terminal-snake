@@ -8,7 +8,6 @@ make all
 ```
 
 Then you start the game by running:
-
 ```
 ./snake
 ```

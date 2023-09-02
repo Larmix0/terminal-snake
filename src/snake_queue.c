@@ -4,6 +4,9 @@
 #include "snake_queue.h"
 #include "locations.h"
 
+/*
+ * Returns a dynamically allocated snake with the first body part made.
+ */
 Snake *snake_init(Location firstPart) {
     Snake *snake = malloc(sizeof(Snake));
     snake->head = NULL;

@@ -1,17 +1,15 @@
-#ifndef SNAKE_H
-#define SNAKE_H
+#ifndef SNAKE_QUEUE_H
+#define SNAKE_QUEUE_H
 
 #include "constants.h"
 #include "locations.h"
 
-typedef struct BodyPart
-{
+typedef struct BodyPart {
     Location location;
     struct BodyPart *next;
 } BodyPart;
 
-typedef struct
-{
+typedef struct {
     BodyPart *head;
     BodyPart *tail;
     int length;
