@@ -7,10 +7,9 @@
 
 #include "constants.h"
 #include "snake_queue.h"
-#include "replace_char.h"
+#include "locations.h"
 
 void render_board();
-void replace_square(Location squareLocation, char newSquare);
 void handle_movement(Direction *direction);
 
 Location spawn_apple(Snake *snake);
@@ -19,11 +18,14 @@ bool apple_eaten(Snake snake, Location *apple);
 bool body_collided(Snake *snake);
 bool border_collided(Snake *snake, Direction direction);
 
+/*
+ * Main function that runs snake.
+ */
 int main() {
-    // hides cursor. Small delay because with no delay hiding sometimes fails
+    // hides cursor. Small delay because it sometimes fails to hide it otherwise
     Sleep(50);
     printf("\033[?25l\n\n");
-    
+
     srand(time(0));
     render_board();
 
@@ -32,10 +34,10 @@ int main() {
     printf("\033[s");
 
     // initialize snake, must set head and tail to NULL because of garbage values
-    Snake snake = {NULL, NULL};
-    Location firstPart = {COLS-1, ROWS-1};
+    Snake snake = {NULL, NULL, 0};
+    Location firstPart = {COLS - 1, ROWS - 1};
     add_body_part(&snake, firstPart);
-    replace_square(snake.head->location, SNAKE_BODY_SYMBOL);
+    replace_location(snake.head->location, SNAKE_BODY_SYMBOL);
 
     Location apple = spawn_apple(&snake);
     Direction direction = UP;
@@ -61,8 +63,8 @@ int main() {
     // show cursor and go down a line with caret
     printf("\033[?25h");
     printf("\033[1B");
-    
-    int score = snake.length-1;
+
+    int score = snake.length - 1;
     int highScore = 0; // default if read file doesn't exist
     FILE *scoreRead = fopen("high_score.txt", "r");
     if (scoreRead != NULL) {
@@ -87,9 +89,12 @@ int main() {
     return EXIT_SUCCESS;
 }
 
+/*
+ * Prints an empty board to the screen at the beginning of the game.
+ */
 void render_board() {
     // +2 accounts for square brackets border "[]"
-    for (int i = 0; i < COLS+2; i++) {
+    for (int i = 0; i < COLS + 2; i++) {
         printf("=");
     }
     printf("\n");
@@ -101,59 +106,68 @@ void render_board() {
         }
         printf("]\n");
     }
-    
-    for (int i = 0; i < COLS+2; i++) {
+
+    for (int i = 0; i < COLS + 2; i++) {
         printf("=");
     }
 }
 
+/*
+ * Switches directions whenever you hit an arrow key.
+ * It does so with by detecting arrow keys using conio.h by sending two characters.
+ * First is always a 0 (to signify a special number's coming) then the second is a real number
+ * which would've represented a normal character in without the special 0 first.
+ * That's why we return/skip if we don't get the special signal (int 0)
+ */
 void handle_movement(Direction *direction) {
     // no press detected
     if (!kbhit()) {
         return;
     }
-    /* conio.h detects arrow keys by sending two characters. First is a 0 and second is a real number
-    which might represent a normal character in most circumstances.
-    That's why we return/skip if we don't get the special signal (int 0)
-    */
     char keyPressed = getch();
     if (keyPressed != 0) {
         return;
     }
-    // first char was special signal (int 0) so now we detect 2nd char
+    // first char was special signal (0) so now we detect 2nd char
     char actualKey = getch();
     switch (actualKey) {
-        case UP:
-            if (*direction != DOWN) {
-                *direction = UP;
-            }
-            break;
-        case DOWN:
-            if (*direction != UP) {
-                *direction = DOWN;
-            }
-            break;
-        case RIGHT:
-            if (*direction != LEFT) {
-                *direction = RIGHT;
-            }
-            break;
-        case LEFT:
-            if (*direction != RIGHT) {
-                *direction = LEFT;
-            }
-            break;
+    case UP:
+        if (*direction != DOWN) {
+            *direction = UP;
+        }
+        break;
+    case DOWN:
+        if (*direction != UP) {
+            *direction = DOWN;
+        }
+        break;
+    case RIGHT:
+        if (*direction != LEFT) {
+            *direction = RIGHT;
+        }
+        break;
+    case LEFT:
+        if (*direction != RIGHT) {
+            *direction = LEFT;
+        }
+        break;
     }
 }
 
+/*
+ * Writes an apple at a random, valid location on the screen.
+ * It recursively calls itself if the randomly generated position is invalid,
+ * and it does so forever until it finds a valid spot.
+ * The function doesn't utilize memcpy because recursion kinda breaks it,
+ * so we store the original head to switch back to it when we alter the real snake.
+ */
 Location spawn_apple(Snake *snake) {
-    // we don't use memcpy because this function relies on recursion, so we store original head instead
     BodyPart *originalHead = snake->head;
-    Location apple = {rand()%(COLS), rand()%(ROWS)};
+    Location apple = {rand() % (COLS), rand() % (ROWS)};
 
     while (snake->head != NULL) {
-        if (snake->head->location.x == apple.x && snake->head->location.y == apple.y) {
-            // change back to original head, recurse till we find a valid apple location
+        if (locations_match(snake->head->location, apple)) {
+            // recurse till we find a valid apple location
             snake->head = originalHead;
             apple = spawn_apple(snake);
             break;
@@ -162,45 +176,64 @@ Location spawn_apple(Snake *snake) {
     }
     // we altered the real snake->head, so we change it back
     snake->head = originalHead;
-    replace_square(apple, APPLE_SYMBOL);
+    replace_location(apple, APPLE_SYMBOL);
     return apple;
 }
 
+/*
+ * Checks if apple was eaten by seeing if its location matches any of the snake's body parts.
+ */
 bool apple_eaten(Snake snake, Location *apple) {
-    if (snake.head->location.x == apple->x && snake.head->location.y == apple->y) {
+    if (locations_match(snake.head->location, *apple)) {
         *apple = spawn_apple(&snake);
         return true;
     }
     return false;
 }
 
+/*
+ * Checks if snake's head collided with any other body part.
+ * It does so by keeping track of 2 pointers to check if any 2 body parts match in x and y.
+ */
 bool body_collided(Snake *snake) {
-    BodyPart *tmp1 = snake->head;
-    BodyPart *tmp2 = snake->head;
+    BodyPart *bodyPtr1 = snake->head;
+    BodyPart *bodyPtr2 = snake->head;
 
     // checks if any body part collides with another body part
-    while (tmp1->next != NULL) {
-        while (tmp2->next != NULL) {
-            tmp2 = tmp2->next;
-            if (tmp1->location.x == tmp2->location.x && tmp1->location.y == tmp2->location.y) {
+    while (bodyPtr1->next != NULL) {
+        while (bodyPtr2->next != NULL) {
+            bodyPtr2 = bodyPtr2->next;
+
+            if (locations_match(bodyPtr1->location, bodyPtr2->location)) {
                 return true;
             }
         }
-        tmp1 = tmp1->next;
-        tmp2 = tmp1->next;
+        bodyPtr1 = bodyPtr1->next;
+        bodyPtr2 = bodyPtr1->next;
     }
     return false;
 }
 
+/*
+ * checks if any body part collided with the border and returns result in a bool.
+ */
 bool border_collided(Snake *snake, Direction direction) {
     Location headLocation = snake->head->location;
 
     // predicts next location
     switch (direction) {
-        case UP: headLocation.y--; break;
-        case DOWN: headLocation.y++; break;
-        case RIGHT: headLocation.x++; break;
-        case LEFT: headLocation.x--; break;
+    case UP:
+        headLocation.y--;
+        break;
+    case DOWN:
+        headLocation.y++;
+        break;
+    case RIGHT:
+        headLocation.x++;
+        break;
+    case LEFT:
+        headLocation.x--;
+        break;
     }
     // check if we'll collide
     if (headLocation.x < 0 || headLocation.x >= COLS) {

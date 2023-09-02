@@ -3,6 +3,8 @@
     "snakequeue.h": "c",
     "snake_queue.h": "c",
     "stdio.h": "c",
-    "stdbool.h": "c"
+    "stdbool.h": "c",
+    "constants.h": "c",
+    "locations.h": "c"
   }
 }
