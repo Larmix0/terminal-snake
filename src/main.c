@@ -175,21 +175,19 @@ bool apple_eaten(Snake snake, Location *apple) {
 }
 
 bool body_collided(Snake *snake) {
-    Snake *tmp1, *tmp2;
-
-    memcpy(tmp1, snake, sizeof(snake));
-    memcpy(tmp2, snake, sizeof(snake));
+    BodyPart *tmp1 = snake->head;
+    BodyPart *tmp2 = snake->head;
 
     // checks if any body part collides with another body part
-    while (tmp1->head->next != NULL) {
-        while (tmp2->head->next != NULL) {
-            tmp2->head = tmp2->head->next;
-            if (tmp1->head->location.x == tmp2->head->location.x && tmp1->head->location.y == tmp2->head->location.y) {
+    while (tmp1->next != NULL) {
+        while (tmp2->next != NULL) {
+            tmp2 = tmp2->next;
+            if (tmp1->location.x == tmp2->location.x && tmp1->location.y == tmp2->location.y) {
                 return true;
             }
         }
-        tmp1->head = tmp1->head->next;
-        tmp2->head = tmp1->head->next;
+        tmp1 = tmp1->next;
+        tmp2 = tmp1->next;
     }
     return false;
 }
