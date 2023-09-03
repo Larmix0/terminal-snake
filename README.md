@@ -9,7 +9,7 @@ make all
 
 Then you start the game by running:
 ```
-./snake
+./bin/snake
 ```
 
 ![game example](example_snake.png)

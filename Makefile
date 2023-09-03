@@ -1,18 +1,26 @@
 CC=gcc
 CFLAGS=-Wall -Wextra -Wpedantic -Werror -g
 
-SRCS=$(wildcard src/*.c)
-OBJS=*.o
+SRC_DIR=src
+BIN=bin
 
-BIN=snake
+EXE=snake
 
-all: $(BIN)
+SRCS=$(wildcard $(SRC_DIR)/*.c)
+OBJS=$(patsubst $(SRC_DIR)/%.c, $(BIN)/%.o, $(SRCS))
 
-$(BIN): $(OBJS)
-	$(CC) -o $@ $^
+.PHONY: all clean
 
-$(OBJS): $(SRCS)
-	$(CC) $(CFLAGS) -c $^
+all: $(EXE)
+
+$(EXE): $(BIN) $(OBJS)
+	$(CC) -o $(BIN)/$@ $(OBJS)
+
+$(BIN)/%.o: $(SRC_DIR)/%.c
+	$(CC) $(CFLAGS) -c $^ -o $@
+
+$(BIN):
+	mkdir $(BIN)
 
 clean:
-	del $(OBJS) $(BIN).exe
+	@if exist $(BIN) rmdir /s /q $(BIN)
