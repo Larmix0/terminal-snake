@@ -1,5 +1,5 @@
 CC=gcc
-CFLAGS=-Wall -Wextra -g
+CFLAGS=-Wall -Wextra -Wpedantic -Werror -g
 
 SRCS=$(wildcard src/*.c)
 OBJS=*.o
