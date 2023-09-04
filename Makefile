@@ -14,7 +14,7 @@ OBJS=$(patsubst $(SRC_DIR)/%.c, $(BIN)/%.o, $(SRCS))
 all: $(EXE)
 
 $(EXE): $(BIN) $(OBJS)
-	$(CC) -o $(BIN)/$@ $(OBJS)
+	$(CC) -o $</$@ $(OBJS)
 
 $(BIN)/%.o: $(SRC_DIR)/%.c
 	$(CC) $(CFLAGS) -c $^ -o $@
@@ -23,4 +23,9 @@ $(BIN):
 	mkdir $(BIN)
 
 clean:
-	@if exist $(BIN) rmdir /s /q $(BIN)
+ifneq ("$(wildcard $(BIN))","")
+	@rmdir /s /q $(BIN)
+	@echo Removed $(BIN) successfully.
+else
+	@echo Directory $(BIN) doesn't exist.
+endif
