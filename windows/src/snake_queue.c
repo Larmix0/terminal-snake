@@ -4,6 +4,8 @@
 #include "snake_queue.h"
 #include "locations.h"
 
+static void add_body_part(Snake *snake, Location location);
+static void remove_body_part(Snake *snake);
 /*
  * Returns a dynamically allocated snake with the first body part made.
  */
@@ -25,7 +27,7 @@ Snake *snake_init(Location firstPart) {
  * This could happen while moving with one body part
  * since we delete the head and then put it somewhere else in that case.
  */
-void add_body_part(Snake *snake, Location location) {
+static void add_body_part(Snake *snake, Location location) {
     // create new body part
     BodyPart *newBodyPart = malloc(sizeof(BodyPart));
     if (newBodyPart == NULL) {
@@ -51,7 +53,7 @@ void add_body_part(Snake *snake, Location location) {
  * Sets 2nd to last body part to be the new tail and deallocates the old tail.
  * If snake only has one body part then just make it store NULL.
  */
-void remove_body_part(Snake *snake) {
+static void remove_body_part(Snake *snake) {
     // store head so we can deallocate if needed
     BodyPart *tmp = snake->head;
 

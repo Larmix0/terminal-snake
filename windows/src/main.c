@@ -110,7 +110,7 @@ void render_board() {
  * That's why we return/skip if we don't get the special signal (int 0)
  */
 void handle_movement(Direction *direction) {
-    if (!kbhit() || getch() != 0) {
+    if (!kbhit()) {
         return;
     }
     // first char was special signal (0) so now we detect 2nd char

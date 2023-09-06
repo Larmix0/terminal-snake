@@ -18,12 +18,6 @@ typedef struct {
 // returns an initialized snake with one body part in the corner of the map.
 Snake *snake_init(Location firstPart);
 
-// Puts a new body part as the head in passed location.
-void add_body_part(Snake *snake, Location location);
-
-// Removes the snake's tail.
-void remove_body_part(Snake *snake);
-
 /*
  * move_tail: Simply removes tail.
  * move_head: Puts a new head of the snake depending on the direction.

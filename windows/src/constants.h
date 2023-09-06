@@ -11,10 +11,10 @@
 #define DELAY_MS 65
 
 typedef enum {
-    UP = 72,
-    DOWN = 80,
-    RIGHT = 77,
-    LEFT = 75
+    UP = 119,
+    DOWN = 115,
+    RIGHT = 100,
+    LEFT = 97
 } Direction;
 
 #endif
