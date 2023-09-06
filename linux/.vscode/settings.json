@@ -1,0 +1,12 @@
+{
+  "files.associations": {
+    "snakequeue.h": "c",
+    "snake_queue.h": "c",
+    "stdio.h": "c",
+    "stdbool.h": "c",
+    "constants.h": "c",
+    "locations.h": "c",
+    "termios.h": "c",
+    "time.h": "c"
+  }
+}
