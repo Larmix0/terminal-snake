@@ -50,7 +50,7 @@ void set_snake_terminal() {
 }
 
 /*
- * Switches directions whenever you hit an arrow key.
+ * Switches directions whenever you hit a WASD key.
  * It does so with by detecting keys using termios.h, sys/select.h and reading from stdin.
  */
 void handle_movement(Direction *direction) {

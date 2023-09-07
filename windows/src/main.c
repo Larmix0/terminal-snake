@@ -103,19 +103,15 @@ void render_board() {
 }
 
 /*
- * Switches directions whenever you hit an arrow key.
- * It does so with by detecting arrow keys using conio.h by sending two characters.
- * First is always a 0 (to signify a special number's coming) then the second is a real number
- * which would've represented a normal character in without the special 0 first.
- * That's why we return/skip if we don't get the special signal (int 0)
+ * Switches directions whenever you hit a WASD key.
+ * It does so by using conio.h's kbhit to detect a key press
+ * and getch to see which character was pressed.
  */
 void handle_movement(Direction *direction) {
     if (!kbhit()) {
         return;
     }
-    // first char was special signal (0) so now we detect 2nd char
-    char actualKey = getch();
-    switch (actualKey) {
+    switch (getch()) {
     case UP:
         if (*direction != DOWN) {
             *direction = UP;
