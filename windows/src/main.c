@@ -225,8 +225,8 @@ void cmp_score_with_pb(int score, int *highestScore, bool *isPersonalBest) {
     FILE *scoreRead = fopen("high_score.txt", "r");
     if (scoreRead != NULL) {
         fscanf(scoreRead, "%d", &highScore);
+        fclose(scoreRead);
     }
-    fclose(scoreRead);
 
     *highestScore = score > highScore ? score : highScore;
     FILE *scoreWrite = fopen("high_score.txt", "w");
